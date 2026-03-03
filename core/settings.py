@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from corsheaders.defaults import default_headers
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-mq_(^s*ptpg*+x20p3ri4f9ahf=pgv%v6r=kzckb!vtp@y2ij6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['event-management-with-qr-verification.onrender.com']
 
 
 # Application definition
@@ -69,6 +69,9 @@ CORS_ALLOWED_ORIGINS = [
 # If using axios with credentials later:
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "authorization",
+]
 
 ROOT_URLCONF = 'core.urls'
 

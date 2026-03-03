@@ -109,7 +109,7 @@ class EventListView(APIView):
         elif sort_by=='-price':
             events=events.order_by('-price')
         
-        serializer=EventSerializer(events,many=True)
+        serializer=EventSerializer(events,many=True,context={"request": request})
         return Response(serializer.data)
     
     
@@ -129,7 +129,7 @@ class EventDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        serializer=EventSerializer(event)
+        serializer=EventSerializer(event,context={"request": request})
         return Response(serializer.data)
     
     
@@ -138,7 +138,7 @@ class MyHostedEventsView(APIView):
 
     def get(self, request):
         events = Event.objects.filter(host=request.user)
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(events, many=True, context={"request": request})
         return Response(serializer.data)
 
 
@@ -367,6 +367,6 @@ class AdminEventListView(APIView):
 
     def get(self, request):
         events = Event.objects.all().order_by("-created_at")
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(events, many=True,context={"request": request})
         return Response(serializer.data)
 

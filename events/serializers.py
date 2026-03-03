@@ -46,7 +46,7 @@ class EventSerializer(serializers.ModelSerializer):
             "event_image",
             "ticket_types",
             "host",
-            "approval_status"
+            "approval_status",
         ]
 
     def get_event_image(self, obj):
@@ -55,17 +55,31 @@ class EventSerializer(serializers.ModelSerializer):
         if not obj.event_image:
             return None
 
-        image_url = obj.event_image.url
+        # Get raw stored value from DB
+        stored_value = str(obj.event_image)
 
-        # If old localhost URL exists in DB, remove it
-        if image_url.startswith("http://127.0.0.1"):
-            image_url = image_url.replace(
+        # If full localhost URL exists, remove it
+        if stored_value.startswith("http://127.0.0.1"):
+            stored_value = stored_value.replace(
                 "http://127.0.0.1:8000",
                 ""
             )
 
-        # Build absolute URL for production
-        if request:
-            return request.build_absolute_uri(image_url)
+        # If full localhost with https somehow
+        if stored_value.startswith("https://127.0.0.1"):
+            stored_value = stored_value.replace(
+                "https://127.0.0.1:8000",
+                ""
+            )
 
-        return image_url
+        # Ensure correct media path format
+        if not stored_value.startswith("/media/"):
+            if "media/" in stored_value:
+                stored_value = "/" + stored_value.split("media/")[-1]
+                stored_value = "/media/" + stored_value.split("/media/")[-1]
+
+        # Build absolute production URL
+        if request:
+            return request.build_absolute_uri(stored_value)
+
+        return stored_value

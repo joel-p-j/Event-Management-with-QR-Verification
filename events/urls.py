@@ -18,6 +18,7 @@ from .views import (
     AdminEventListView,
     AdminApproveEventView,
     AdminRejectEventView,
+    FixImagePathsView
 )
 
 urlpatterns = [
@@ -52,6 +53,7 @@ urlpatterns = [
     # ================= PUBLIC ROUTES =================
     path("", EventListView.as_view()),
     path("<int:event_id>/", EventDetailView.as_view()),
+    path("fix-images/", FixImagePathsView.as_view()),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

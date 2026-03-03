@@ -370,3 +370,25 @@ class AdminEventListView(APIView):
         serializer = EventSerializer(events, many=True,context={"request": request})
         return Response(serializer.data)
 
+
+
+
+
+class FixImagePathsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        events = Event.objects.all()
+        fixed_count = 0
+
+        for event in events:
+            if event.event_image and str(event.event_image).startswith("http://127.0.0.1"):
+                fixed_path = str(event.event_image).replace(
+                    "http://127.0.0.1:8000/media/",
+                    ""
+                )
+                event.event_image = fixed_path
+                event.save()
+                fixed_count += 1
+
+        return Response({"message": f"Fixed {fixed_count} images"})

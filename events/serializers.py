@@ -30,7 +30,7 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     host = serializers.ReadOnlyField(source="host.id")
-    event_image = serializers.ImageField(required=False)
+    event_image = serializers.SerializerMethodField()
     ticket_types = TicketTypeSerializer(many=True, read_only=True)
     approval_status = serializers.ReadOnlyField()
 
@@ -48,3 +48,24 @@ class EventSerializer(serializers.ModelSerializer):
             "host",
             "approval_status"
         ]
+
+    def get_event_image(self, obj):
+        request = self.context.get("request")
+
+        if not obj.event_image:
+            return None
+
+        image_url = obj.event_image.url
+
+        # If old localhost URL exists in DB, remove it
+        if image_url.startswith("http://127.0.0.1"):
+            image_url = image_url.replace(
+                "http://127.0.0.1:8000",
+                ""
+            )
+
+        # Build absolute URL for production
+        if request:
+            return request.build_absolute_uri(image_url)
+
+        return image_url

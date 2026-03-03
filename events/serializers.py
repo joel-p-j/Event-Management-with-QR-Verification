@@ -50,5 +50,15 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
     def get_event_image(self, obj):
-        # 🔥 TEMPORARY DEBUG
-        return "TEST_IMAGE_URL"
+        request = self.context.get("request")
+
+        if not obj.event_image:
+            return None
+
+        # Always build correct MEDIA path
+        image_url = f"/media/{obj.event_image.name}"
+
+        if request:
+            return request.build_absolute_uri(image_url)
+
+        return image_url

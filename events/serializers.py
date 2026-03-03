@@ -55,31 +55,10 @@ class EventSerializer(serializers.ModelSerializer):
         if not obj.event_image:
             return None
 
-        # Get raw stored value from DB
-        stored_value = str(obj.event_image)
+        # Always build correct MEDIA path manually
+        image_path = f"/media/{obj.event_image.name}"
 
-        # If full localhost URL exists, remove it
-        if stored_value.startswith("http://127.0.0.1"):
-            stored_value = stored_value.replace(
-                "http://127.0.0.1:8000",
-                ""
-            )
-
-        # If full localhost with https somehow
-        if stored_value.startswith("https://127.0.0.1"):
-            stored_value = stored_value.replace(
-                "https://127.0.0.1:8000",
-                ""
-            )
-
-        # Ensure correct media path format
-        if not stored_value.startswith("/media/"):
-            if "media/" in stored_value:
-                stored_value = "/" + stored_value.split("media/")[-1]
-                stored_value = "/media/" + stored_value.split("/media/")[-1]
-
-        # Build absolute production URL
         if request:
-            return request.build_absolute_uri(stored_value)
+            return request.build_absolute_uri(image_path)
 
-        return stored_value
+        return image_path

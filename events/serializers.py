@@ -30,7 +30,13 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     host = serializers.ReadOnlyField(source="host.id")
-    event_image = serializers.SerializerMethodField()
+
+    # writeable field (used when uploading)
+    event_image = serializers.ImageField(required=False, allow_null=True)
+
+    # read-only field for frontend display
+    event_image_url = serializers.SerializerMethodField(read_only=True)
+
     ticket_types = TicketTypeSerializer(many=True, read_only=True)
     approval_status = serializers.ReadOnlyField()
 
@@ -44,21 +50,21 @@ class EventSerializer(serializers.ModelSerializer):
             "location",
             "category",
             "event_image",
+            "event_image_url",
             "ticket_types",
             "host",
             "approval_status",
         ]
 
-    def get_event_image(self, obj):
+    def get_event_image_url(self, obj):
         request = self.context.get("request")
 
         if not obj.event_image:
             return None
 
-        # Always build correct MEDIA path
-        image_url = f"/media/{obj.event_image.name}"
+        url = obj.event_image.url
 
         if request:
-            return request.build_absolute_uri(image_url)
+            return request.build_absolute_uri(url)
 
-        return image_url
+        return url

@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from cloudinary.models import CloudinaryField
 
 class Event(models.Model):
 
@@ -29,7 +30,7 @@ class Event(models.Model):
     description = models.TextField()
     date = models.DateTimeField()
     location = models.CharField(max_length=255)
-    event_image = models.ImageField(upload_to="event_images/", null=True, blank=True)
+    event_image = CloudinaryField('event_image', blank=True, null=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='music')
 
     approval_status = models.CharField(

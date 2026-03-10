@@ -374,7 +374,7 @@ class AdminEventListView(APIView):
 
 
 
-cclass FixImagePathsView(APIView):
+class FixImagePathsView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request):

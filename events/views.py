@@ -374,7 +374,7 @@ class AdminEventListView(APIView):
 
 
 
-class FixImagePathsView(APIView):
+cclass FixImagePathsView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request):
@@ -382,12 +382,18 @@ class FixImagePathsView(APIView):
         fixed_count = 0
 
         for event in events:
-            if event.event_image and str(event.event_image).startswith("http://127.0.0.1"):
-                fixed_path = str(event.event_image).replace(
-                    "http://127.0.0.1:8000/media/",
-                    ""
-                )
-                event.event_image = fixed_path
+            if event.event_image:
+                image_path = str(event.event_image)
+
+                # remove localhost prefix
+                if "127.0.0.1" in image_path:
+                    image_path = image_path.split("/media/")[-1]
+
+                # remove accidental full URL duplication
+                if image_path.startswith("https"):
+                    image_path = image_path.split("/media/")[-1]
+
+                event.event_image = f"event_images/{image_path.split('/')[-1]}"
                 event.save()
                 fixed_count += 1
 
